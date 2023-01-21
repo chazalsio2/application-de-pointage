@@ -1,0 +1,7 @@
+{
+    "env": {
+        "MONGO_USER":"chazal",
+        "MONGO_PASSWORD":"chanel976",
+        "MAGNO":"TestTechnique"
+    }
+}
