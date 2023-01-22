@@ -3,15 +3,7 @@ const { required } = require('nodemon/lib/config');
 
 
 const eventSchema = mongoose.Schema({
-    title: {
-        type: String,
-        required: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    price: {
+    score: {
         type: String,
         required: true
     },

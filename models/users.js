@@ -18,6 +18,10 @@ const usersSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    code: {
+        type: Array,
+        required: true
+    },
     role: {
         type: Array,
         required: true

@@ -13,26 +13,57 @@ const Users = require('./models/users')
 
 app.use(bodyParser.json());
 
-const events = [];
 const users = [];
+
+const events = async eventIds => {
+    const event = await Event.find({_id:{$in: eventIds}}).lean();
+    if (event) {
+        return event.map(event => {
+            return {
+                ...event._doc,
+                _id: event._id,
+                creator: user.bind(this,event.creator)
+            };
+        });
+    }else{
+        return []
+    }
+}
+
+const user = async userId => {
+    const users = await Users.findById(userId).lean();
+    console.log("users");
+            if (users) {
+                    return {
+                        ...users._doc,
+                        _id: users._id,
+                        email: users.email,
+                        creatEvents: events.bind(this,users.creatEvents)
+                    };
+            }else{
+                return []
+            }
+    }
+
 
 app.use('/graphql',graphqlHTTP({
     schema: buildSchema(`
         type Event {
             _id:ID!
-            title: String!
-            description: String!
-            price: Float!
+            score:String!
             date: String!
+            creator: User!
         }
 
         type User {
             _id: ID!
             email: String!
             password: String!
+            code:String!
             lastName: String!
             firstName: String!
             role: [String!]!
+            creatEvents:[Event!]
         }
 
         input EventInput {
@@ -65,10 +96,17 @@ app.use('/graphql',graphqlHTTP({
         }
     `),
     rootValue: {
-        events: () => {
-            const event = Event.find();
+        events:async  () => {
+            const event = await Event.find().lean();
             if (event) {
-                return event;
+                return event.map(event => {
+                    console.log("event.creator");
+                    return {
+                        ...event._doc,
+                        _id: event._id,
+                        creator: user.bind(this,event.creator),
+                    };
+                });
             }else{
                 return []
             }
@@ -85,9 +123,7 @@ app.use('/graphql',graphqlHTTP({
         },
         createEvent: async (args) => {
             const event = await new Event({
-                title: args.eventIput.title,
-                description: args.eventIput.description,
-                price: +args.eventIput.price,
+                code: args.eventIput.code,
                 date: new Date().toISOString(),
                 creator:'63cba25a8d05fc96c3a30819'
             })
@@ -104,9 +140,7 @@ app.use('/graphql',graphqlHTTP({
                 await Users.updateOne({_id:'63cba25a8d05fc96c3a30819'},{
                     $addToSet:{creatEvents:event._id}
                 })
-                console.log(user);
-                console.log(event);
-                // user.creatEvents.push(event);
+               
             }
 
 
@@ -127,6 +161,7 @@ app.use('/graphql',graphqlHTTP({
                 const user = await new Users({
                     email:arguser.email,
                     password:result,
+                    code:result.code,
                     firstName:arguser.firstName,
                     lastName:arguser.lastName,
                     role:arguser.role
@@ -135,7 +170,7 @@ app.use('/graphql',graphqlHTTP({
                 return user.save();   
             })
             .then((result)=> {
-                    return {...result.doc,_id: result.id, email:result.email, password:null, firstName:result.firstName, lastName:result.lastName, role:result.role };
+                    return {...result.doc,_id: result.id, email:result.email, password:null, firstName:result.firstName, code:result.code, lastName:result.lastName, role:result.role };
                     })
             .catch((err) => { throw new Error;});
                 
@@ -144,7 +179,6 @@ app.use('/graphql',graphqlHTTP({
     },
     graphiql: true
 }))
-
 mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.lrejt.mongodb.net/${process.env.MAGNO}?retryWrites=true&w=majority`)
 .then(() => {
     app.listen(3000);
