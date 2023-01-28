@@ -20,7 +20,7 @@ const eventSchema = mongoose.Schema({
 
 },
 {
-    timestamp:true,
+    timestamps:true,
     collection:"events"
 });
 

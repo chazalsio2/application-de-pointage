@@ -19,7 +19,7 @@ const usersSchema = mongoose.Schema({
         required: true
     },
     code: {
-        type: Array,
+        type: String,
         required: true
     },
     role: {
@@ -37,7 +37,7 @@ const usersSchema = mongoose.Schema({
 ],
 },
 {
-    timestamp:true,
+    timestamps:true,
     collection:"users"
 });
 
