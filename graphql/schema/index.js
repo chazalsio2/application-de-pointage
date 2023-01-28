@@ -32,6 +32,12 @@ input EventInput {
     score: String!
 }
 
+type AuthData {
+    userId: ID!
+    token: String!
+    tokenExpiration: Int!
+}
+
 input UserInput {
     email: String!
     password: String!
@@ -44,6 +50,7 @@ type RootQuery {
     events: [Event!]!
     users: [User!]!
     bookings : [Booking!]
+    login(email: String!, password: String!): AuthData!
 }
 
 type RootMutation {
