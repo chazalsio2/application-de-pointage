@@ -7,6 +7,5 @@ export function getItem(item) {
 }
 
 export function addItem(localStorageName, item) {
-    const result = window.localStorage.setItem(localStorageName,item);
-    console.log(result);
+    window.localStorage.setItem(localStorageName,item);
 }
